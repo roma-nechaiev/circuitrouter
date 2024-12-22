@@ -4,16 +4,16 @@
   "description": "A modern and efficient router for Node.js with a Map-based tree structure, promise-based routing, and flexible parameter validation.",
   "main": "./cjs/Router.js",
   "module": "./esm/Router.js",
-  "types": "./cjs/index.d.ts",
+  "types": "index.d.ts",
   "exports": {
     ".": {
       "require": "./cjs/Router.js",
-      "import": "./esm/Router.js"
+      "import": "./esm/Router.js",
+      "types": "./index.d.ts"
     }
   },
   "scripts": {
-    "build:esm": "tsc -p tsconfig.esm.json",
-    "build:cjs": "tsc -p tsconfig.cjs.json"
+    "build": "tsc"
   },
   "repository": {
     "type": "git",
