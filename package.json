@@ -1,0 +1,43 @@
+{
+  "name": "circuitrouter",
+  "version": "1.0.4",
+  "description": "A modern and efficient router for Node.js with a Map-based tree structure, promise-based routing, and flexible parameter validation.",
+  "main": "./cjs/Router.js",
+  "module": "./esm/Router.js",
+  "types": "./cjs/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./cjs/Router.js",
+      "import": "./esm/Router.js"
+    }
+  },
+  "scripts": {
+    "build:esm": "tsc -p tsconfig.esm.json",
+    "build:cjs": "tsc -p tsconfig.cjs.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/roma-nechaiev/circuitrouter.git"
+  },
+  "keywords": [
+    "router",
+    "nodejs",
+    "typescript",
+    "middleware",
+    "promise",
+    "tree-router",
+    "error-handling"
+  ],
+  "author": "Roman Nechaiev roma.nechaiev@gmail.com",
+  "license": "MIT",
+  "devDependencies": {
+    "@eslint/js": "^9.17.0",
+    "@types/node": "^22.10.2",
+    "eslint": "^9.17.0",
+    "globals": "^15.14.0",
+    "typescript-eslint": "^8.18.1"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
