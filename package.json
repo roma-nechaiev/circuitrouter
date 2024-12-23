@@ -2,15 +2,14 @@
   "name": "circuitrouter",
   "version": "1.0.5",
   "description": "A modern and efficient router for Node.js with a Map-based tree structure, promise-based routing, and flexible parameter validation.",
-  "main": "./cjs/Router.js",
-  "module": "./esm/Router.js",
-  "types": "index.d.ts",
+  "imports": {
+    "#esm": "./esm/Router.js",
+    "#cjs": "./cjs/Router.js",
+    "#types": "./esm/Router.d.ts"
+  },
   "exports": {
-    ".": {
-      "require": "./cjs/Router.js",
-      "import": "./esm/Router.js",
-      "types": "./index.d.ts"
-    }
+    "./esm": "./esm/Router.js",
+    "./cjs": "./cjs/Router.js"
   },
   "scripts": {
     "build": "tsc"

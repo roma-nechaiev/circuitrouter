@@ -7,6 +7,7 @@ A simple and efficient router for Node.js that uses a modern approach to route h
 - **Improved Performance**: The router uses a tree structure for route matching, ensuring quick and efficient lookups without relying on regular expressions. This approach is much faster, especially when dealing with a large number of routes, making the routing process highly efficient.
 
   **Advantages of the underlying structure**:
+
   - **Fast Lookup**: The use of a `Map` ensures that route lookups are done in constant time, which significantly improves performance over traditional methods.
   - **Scalability**: This structure handles increasing numbers of routes efficiently, maintaining fast response times even as your application grows.
   - **Flexibility**: The tree-based structure can adapt to complex routing needs, allowing precise and fast route matching.
@@ -31,6 +32,7 @@ npm install circuitrouter
 ## Basic Setup
 
 Depending on your project setup, you can use **CircuitRouter** with either **CommonJS** or **ESM**. Update your `package.json` accordingly:
+
 - For CommonJS: `"type": "commonjs"`
 - For ESM: `"type": "module"`
 
@@ -38,97 +40,99 @@ Depending on your project setup, you can use **CircuitRouter** with either **Com
 
 ```javascript
 // Import modules
-const http = require("node:http"); // CommonJS
+const http = require('node:http'); // CommonJS
 // import http from "node:http"; // Uncomment for ESM
-const Router = require("circuitrouter"); // CommonJS
-// import Router from "circuitrouter"; // Uncomment for ESM
+const Router = require('circuitrouter/cjs'); // CommonJS
+// import Router from "circuitrouter/esm"; // Uncomment for ESM
 
 const router = new Router();
 
 // Define routes
-router.get("/hello", (req, res) => res.end("Hello, World!"));
-router.post("/data", (req, res) => res.end("Data received"));
+router.get('/hello', (req, res) => res.end('Hello, World!'));
+router.post('/data', (req, res) => res.end('Data received'));
 
 // Match all HTTP methods for a route.
-router.any("/all-methods", (req, res) => {
+router.any('/all-methods', (req, res) => {
   res.end(`Matched method: ${req.method}`);
 });
 
 // Match specific HTTP methods for a route.
-router.match(["post", "put"], "/update", (req, res) => {
+router.match(['post', 'put'], '/update', (req, res) => {
   res.end(`You made a ${req.method} request.`);
 });
 
 // Define a route for a single custom HTTP method.
-router.method("report", "/report", (req, res) => {
-  res.end("Custom REPORT method handled.");
+router.method('report', '/report', (req, res) => {
+  res.end('Custom REPORT method handled.');
 });
 
 // Create the server
 const server = http.createServer(router.onRequest);
 server.listen(3000, () => {
-  console.log("Server is running on http://localhost:3000")
+  console.log('Server is running on http://localhost:3000');
 });
 ```
 
-##  CircuitRouter Integration with Express
+## CircuitRouter Integration with Express
 
 You can use **CircuitRouter** with **Express** by passing the router's request handler into Express's `app.use()` method.
 
 ### Example: Using CircuitRouter with Express
 
 ```javascript
-import express from "express";
-import Router from "circuitrouter";
+import express from 'express';
+import Router from 'circuitrouter';
 
 const app = express();
 const router = new Router();
 
 // Define routes using the router
-router.get("/hello", (req, res) => res.send("Hello, World!"));
-router.post("/data", (req, res) => res.send("Data received"));
+router.get('/hello', (req, res) => res.send('Hello, World!'));
+router.post('/data', (req, res) => res.send('Data received'));
 
 // Use the router with Express using app.use()
-app.use(router.onRequest);  // Pass router's onRequest handler
+app.use(router.onRequest); // Pass router's onRequest handler
 
 // Start the server
 app.listen(3000, () => {
-  console.log("Server is running on http://localhost:3000");
+  console.log('Server is running on http://localhost:3000');
 });
 ```
+
 ### Route Parameters
 
 ```javascript
-router.get("/user/:id", async (req, res) => {
+router.get('/user/:id', async (req, res) => {
   const userId = req.params.id;
   res.end(`User ID: ${userId}`);
-}); 
+});
 
 // Add validation for parameters
 router
-  .get("/product/:id", (req, res) => {
+  .get('/product/:id', (req, res) => {
     res.end(`Product ID: ${req.params.id}`);
   })
-  .where("id", /^[0-9]+$/); // Only allow numeric IDs
+  .where('id', /^[0-9]+$/); // Only allow numeric IDs
 
 // Array of allowed values
 router
-  .get("/status/:level", (req, res) => {
+  .get('/status/:level', (req, res) => {
     res.end(`Status level: ${req.params.level}`);
   })
-  .where("level", ["low", "medium", "high"]); // Only "low", "medium", and "high" are allowed
+  .where('level', ['low', 'medium', 'high']); // Only "low", "medium", and "high" are allowed
 
 // Custom function for validation
 router
-  .get("/user/:age", (req, res) => {
+  .get('/user/:age', (req, res) => {
     res.end(`User age: ${req.params.age}`);
   })
-  .where("age", (value) => parseInt(value) >= 18); // Only ages greater than 18 are allowed
+  .where('age', (value) => parseInt(value) >= 18); // Only ages greater than 18 are allowed
 ```
 
 ### Wildcard Routes
-```javascript 
-router.get("/files/*", async (req, res) => {
+
+```javascript
+router.get('/files/*', async (req, res) => {
   res.end(`File path: ${req.params[0]}`);
 });
 ```
@@ -143,42 +147,42 @@ router.middleware(async (req, res) => {
 
 // Route-specific middleware
 router
-  .get("/protected", async (req, res) => {
-    res.end("Welcome to the protected route");
+  .get('/protected', async (req, res) => {
+    res.end('Welcome to the protected route');
   })
   .middleware(async (req, res) => {
     if (!req.headers.authorization) {
       res.statusCode = 401;
-      res.end("Unauthorized");
-      throw new Error("Unauthorized access");
+      res.end('Unauthorized');
+      throw new Error('Unauthorized access');
     }
   });
 
 // Multiple middlewares for a single route
 router
-  .get("/multiple-middleware", async (req, res) => {
-    res.end("Multiple middleware executed");
+  .get('/multiple-middleware', async (req, res) => {
+    res.end('Multiple middleware executed');
   })
   .middleware(
     async (req, res) => {
-      console.log("First middleware");
+      console.log('First middleware');
     },
     async (req, res) => {
-      console.log("Second middleware");
-    }
+      console.log('Second middleware');
+    },
   );
 ```
 
 ### Grouping Routes
 
 ```javascript
-router.group("/api/v1", (route) => {
-  route.get("/users", async (req, res) => {
-    res.end("User list");
+router.group('/api/v1', (route) => {
+  route.get('/users', async (req, res) => {
+    res.end('User list');
   });
 
-  route.post("/users", async (req, res) => {
-    res.end("User created");
+  route.post('/users', async (req, res) => {
+    res.end('User created');
   });
 });
 ```
@@ -187,14 +191,14 @@ router.group("/api/v1", (route) => {
 
 ```javascript
 router.errorHandler = async (err, req, res) => {
-  console.error("Error:", err.message);
+  console.error('Error:', err.message);
   res.statusCode = 500;
-  res.setHeader("Content-Type", "application/json");
+  res.setHeader('Content-Type', 'application/json');
   res.end(
     JSON.stringify({
       status: 500,
       error: err.message,
-    })
+    }),
   );
 };
 ```
@@ -204,16 +208,17 @@ router.errorHandler = async (err, req, res) => {
 ```javascript
 router.notFoundHandler = async (req, res) => {
   res.statusCode = 404;
-  res.setHeader("Content-Type", "application/json");
+  res.setHeader('Content-Type', 'application/json');
   res.end(
     JSON.stringify({
       status: 404,
-      message: "Route not found",
-    })
+      message: 'Route not found',
+    }),
   );
   res.end();
 };
 ```
+
 ## API Reference
 
 ### `Router`
