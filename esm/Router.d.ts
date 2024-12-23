@@ -5,7 +5,7 @@ export type Handler = (req: IncomingMessage & {
     params: Params;
 }, res: ServerResponse) => void | Promise<void>;
 export type Params = Record<string, string>;
-type ErrorHandler = (err: Error, req: IncomingMessage, res: ServerResponse) => void | Promise<void>;
+export type ErrorHandler = (err: Error, req: IncomingMessage, res: ServerResponse) => void | Promise<void>;
 declare class Router {
     middlewares: Handler[];
     groupStack: string[];
