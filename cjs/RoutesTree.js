@@ -6,9 +6,9 @@ class RoutesTree {
     /**
      * Add a route to the tree.
      *
-     * @param {Route} route - The route to add.
-     * @param {string[]} methods - The methods to add the route for.
-     * @throws {Error} if there is already a route registered for one of the methods.
+     * @param route - The route to add.
+     * @param methods - The methods to add the route for.
+     * @throws if there is already a route registered for one of the methods.
      */
     addRoute(route, methods) {
         for (const method of methods) {
@@ -29,9 +29,9 @@ class RoutesTree {
     /**
      * Find a route in the routes tree that matches the given HTTP method and URL.
      *
-     * @param {string} method The HTTP method to match
-     * @param {string} url The URL to match
-     * @returns {{ route: Route; params: Params } | null} An object with the matched route and the parsed URL parameters, or null if no route is found
+     * @param method The HTTP method to match
+     * @param url The URL to match
+     * @returns  An object with the matched route and the parsed URL parameters, or null if no route is found
      */
     findRoute(method, url) {
         const methodNode = this.root.children.get(method);
@@ -47,10 +47,10 @@ class RoutesTree {
      * If a route is found, returns an object with the route and the parsed params.
      * If no route is found, returns null.
      *
-     * @param {RouteNode} node The current node in the routes tree
-     * @param {string[]} parts The remaining parts of the url to match
-     * @param {Params} params The parsed params so far
-     * @returns {{ route: Route; params: Params } | null} An object with the route and the parsed params, or null if no route is found
+     * @param node The current node in the routes tree
+     * @param parts The remaining parts of the url to match
+     * @param params The parsed params so far
+     * @returns An object with the route and the parsed params, or null if no route is found
      */
     matchRoute(node, parts, params) {
         if (parts.length === 0) {
@@ -91,8 +91,8 @@ class RoutesTree {
     }
     /**
      * Finds or creates a route node for the given HTTP method.
-     * @param {string} method the HTTP method to find or create a route node for
-     * @returns {RouteNode} the route node for the given HTTP method
+     * @param method the HTTP method to find or create a route node for
+     * @returns the route node for the given HTTP method
      * @private
      */
     findOrCreateMethodNode(method) {
@@ -109,9 +109,9 @@ class RoutesTree {
      * can be a regular expression, an array of allowed values, or a custom validation
      * function.
      *
-     * @param {Route} route The route object containing the "wheres" conditions.
-     * @param {Record<string, string>} params The parameters to validate against the route's conditions.
-     * @returns {boolean} `true` if all conditions are satisfied, otherwise `boolean`
+     * @param route The route object containing the "wheres" conditions.
+     * @param params The parameters to validate against the route's conditions.
+     * @returns `true` if all conditions are satisfied, otherwise `boolean`
      */
     validateWheres(route, params) {
         for (const [key, condition] of Object.entries(route.wheres)) {

@@ -2,6 +2,7 @@
 const { METHODS, STATUS_CODES } = require("node:http");
 const RoutesTree = require("./RoutesTree.js");
 const Route = require("./Route.js");
+/** @type {import('circuitrouter/cjs')} */
 class Router {
     constructor() {
         this.middlewares = [];
@@ -56,9 +57,9 @@ class Router {
     /**
      * Registers a route handler for GET and HEAD requests to a specified URI.
      *
-     * @param {string} uri - The URI pattern to match for the route.
-     * @param {Handler} action - The handler function to execute when the route is matched.
-     * @returns {Route} The created route instance.
+     * @param uri - The URI pattern to match for the route.
+     * @param action - The handler function to execute when the route is matched.
+     * @returns The created route instance.
      */
     get(uri, action) {
         return this.createRoute(['GET', 'HEAD'], uri, action);
@@ -66,9 +67,9 @@ class Router {
     /**
      * Registers a route handler for POST requests to a specified URI.
      *
-     * @param {string} uri - The URI pattern to match for the route.
-     * @param {Handler} action - The handler function to execute when the route is matched.
-     * @returns {Route} The created route instance.
+     * @param uri - The URI pattern to match for the route.
+     * @param action - The handler function to execute when the route is matched.
+     * @returns The created route instance.
      */
     post(uri, action) {
         return this.createRoute('POST', uri, action);
@@ -76,9 +77,9 @@ class Router {
     /**
      * Registers a route handler for PUT requests to a specified URI.
      *
-     * @param {string} uri - The URI pattern to match for the route.
-     * @param {Handler} action - The handler function to execute when the route is matched.
-     * @returns {Route} The created route instance.
+     * @param uri - The URI pattern to match for the route.
+     * @param action - The handler function to execute when the route is matched.
+     * @returns The created route instance.
      */
     put(uri, action) {
         return this.createRoute('PUT', uri, action);
@@ -86,9 +87,9 @@ class Router {
     /**
      * Registers a route handler for PATCH requests to a specified URI.
      *
-     * @param {string} uri - The URI pattern to match for the route.
-     * @param {Handler} action - The handler function to execute when the route is matched.
-     * @returns {Route} The created route instance.
+     * @param uri - The URI pattern to match for the route.
+     * @param action - The handler function to execute when the route is matched.
+     * @returns The created route instance.
      */
     patch(uri, action) {
         return this.createRoute('PATCH', uri, action);
@@ -96,9 +97,9 @@ class Router {
     /**
      * Registers a route handler for DELETE requests to a specified URI.
      *
-     * @param {string} uri - The URI pattern to match for the route.
-     * @param {Handler} action - The handler function to execute when the route is matched.
-     * @returns {Route} The created route instance.
+     * @param uri - The URI pattern to match for the route.
+     * @param action - The handler function to execute when the route is matched.
+     * @returns The created route instance.
      */
     delete(uri, action) {
         return this.createRoute('DELETE', uri, action);
@@ -106,9 +107,9 @@ class Router {
     /**
      * Registers a route handler for OPTIONS requests to a specified URI.
      *
-     * @param {string} uri - The URI pattern to match for the route.
-     * @param {Handler} action - The handler function to execute when the route is matched.
-     * @returns {Route} The created route instance.
+     * @param uri - The URI pattern to match for the route.
+     * @param action - The handler function to execute when the route is matched.
+     * @returns The created route instance.
      */
     options(uri, action) {
         return this.createRoute('OPTIONS', uri, action);
@@ -116,9 +117,9 @@ class Router {
     /**
      * Registers a route handler for all HTTP methods to a specified URI.
      *
-     * @param {string} uri - The URI pattern to match for the route.
-     * @param {Handler} action - The handler function to execute when the route is matched.
-     * @returns {Route} The created route instance.
+     * @param uri - The URI pattern to match for the route.
+     * @param action - The handler function to execute when the route is matched.
+     * @returns The created route instance.
      */
     any(uri, action) {
         return this.createRoute(METHODS, uri, action);
@@ -126,10 +127,10 @@ class Router {
     /**
      * Registers a route handler for any of the specified HTTP methods to a specified URI.
      *
-     * @param {string[]} methods - An array of HTTP methods (e.g., 'GET', 'POST') associated with this route.
-     * @param {string} uri - The URI pattern to match for the route.
-     * @param {Handler} action - The handler function to execute when the route is matched.
-     * @returns {Route} The created route instance.
+     * @param methods - An array of HTTP methods (e.g., 'GET', 'POST') associated with this route.
+     * @param uri - The URI pattern to match for the route.
+     * @param action - The handler function to execute when the route is matched.
+     * @returns The created route instance.
      */
     match(methods, uri, action) {
         if (!Array.isArray(methods)) {
@@ -152,10 +153,10 @@ class Router {
     /**
      * Registers a route handler for the specified HTTP method to a specified URI.
      *
-     * @param {string} method - The HTTP method to associate with this route (e.g., 'GET', 'POST').
-     * @param {string} uri - The URI pattern to match for the route.
-     * @param {Handler} action - The handler function to execute when the route is matched.
-     * @returns {Route} The created route instance.
+     * @param method - The HTTP method to associate with this route (e.g., 'GET', 'POST').
+     * @param uri - The URI pattern to match for the route.
+     * @param action - The handler function to execute when the route is matched.
+     * @returns The created route instance.
      */
     method(method, uri, action) {
         if (typeof method !== 'string') {
@@ -173,12 +174,12 @@ class Router {
     /**
      * Groups a set of route handlers under a common URI prefix.
      *
-     * @param {string} prefix - The URI prefix to apply to all routes registered
+     * @param prefix - The URI prefix to apply to all routes registered
      * within the provided callback.
-     * @param {(router: Router) => void} routes - The callback to execute when
+     * @param routes - The callback to execute when
      * grouping routes. The Router instance is passed as an argument to the
      * callback.
-     * @returns {this} The Router instance to support method chaining.
+     * @returns The Router instance to support method chaining.
      */
     group(prefix, routes) {
         this.groupStack.push(prefix);
@@ -188,9 +189,9 @@ class Router {
     /**
      * Registers one or more middleware functions to be executed by the router.
      *
-     * @param {...Handler[]} handlers - One or more middleware functions to register.
-     * @returns {this} The Router instance to support method chaining.
-     * @throws {TypeError} If any of the provided handlers is not a function.
+     * @param handlers - One or more middleware functions to register.
+     * @returns The Router instance to support method chaining.
+     * @throws If any of the provided handlers is not a function.
      */
     middleware(...handlers) {
         handlers.forEach(handler => {
@@ -204,10 +205,10 @@ class Router {
     /**
      * Creates and registers a new route with the specified HTTP methods, URI, and action.
      *
-     * @param {string | string[]} methods - The HTTP method(s) to associate with the route (e.g., 'GET', 'POST').
-     * @param {string} uri - The URI pattern for the route.
-     * @param {Handler} action - The handler function to be executed when the route is matched.
-     * @returns {Route} The newly created Route instance.
+     * @param methods - The HTTP method(s) to associate with the route (e.g., 'GET', 'POST').
+     * @param uri - The URI pattern for the route.
+     * @param action - The handler function to be executed when the route is matched.
+     * @returns The newly created Route instance.
      * @private
      */
     createRoute(methods, uri, action) {
