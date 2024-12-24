@@ -67,7 +67,7 @@ router.method('report', '/report', (req, res) => {
 });
 
 // Create the server
-const server = http.createServer(router.onRequest);
+const server = http.createServer((req, res) => router.onRequest(req, res));
 server.listen(3000, () => {
   console.log('Server is running on http://localhost:3000');
 });
@@ -91,7 +91,7 @@ router.get('/hello', (req, res) => res.send('Hello, World!'));
 router.post('/data', (req, res) => res.send('Data received'));
 
 // Use the router with Express using app.use()
-app.use(router.onRequest); // Pass router's onRequest handler
+app.use((req, res) => router.onRequest(req, res)); // Pass router's onRequest handler
 
 // Start the server
 app.listen(3000, () => {
@@ -187,7 +187,7 @@ router.group('/api/v1', (route) => {
 });
 ```
 
-### Middleware Setup
+### Error Handlers Setup
 
 CircuitRouter now allows the direct import and integration of `notFoundHandler` and `errorHandler` from the `circuitrouter` module. These handlers can be passed to the `Router` constructor during instantiation.
 
