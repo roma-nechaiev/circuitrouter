@@ -1,6 +1,6 @@
 {
   "name": "circuitrouter",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "A modern and efficient router for Node.js with a Map-based tree structure, promise-based routing, and flexible parameter validation.",
   "main": "./cjs/Router.js",
   "types": "./cjs/index.d.ts",
