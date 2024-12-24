@@ -125,6 +125,9 @@ export class Router {
     middlewares: Handler[];
     groupStack: string[];
     tree: RoutesTree;
+    notFoundHandler: Handler;
+    errorHandler: ErrorHandler;
+    constructor(notFoundHandler: Handler, errorHandler: ErrorHandler);
     /**
      * Registers a route handler for GET and HEAD requests to a specified URI.
      *
@@ -228,11 +231,28 @@ export class Router {
      * @private
      */
     private createRoute;
-    onRequest: Handler;
-    notFoundHandler: Handler;
-    errorHandler: ErrorHandler;
+    onRequest(req: IncomingMessage & {
+        params: Params;
+    }, res: ServerResponse): Promise<void>;
 }
 
+/**
+ * Handles 404 errors by sending a JSON response with status 404.
+ *
+ * @param req - The incoming HTTP request.
+ * @param res - The outgoing HTTP response.
+ * @returns A Promise that resolves when the response has been sent.
+ */
+export function notFoundHandler(req: IncomingMessage, res: ServerResponse): Promise<void>;
+/**
+ * Handles errors by logging them and sending a JSON response with status 500.
+ *
+ * @param err - The error object to handle.
+ * @param req - The incoming HTTP request.
+ * @param res - The outgoing HTTP response.
+ */
+export function errorHandler(err: Error, req: IncomingMessage, res: ServerResponse): Promise<void>;
+
 declare module "circuitrouter/cjs" {
-    export = Router;
+    export = { Router, notFoundHandler, errorHandler };
 }

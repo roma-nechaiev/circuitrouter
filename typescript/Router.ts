@@ -1,16 +1,30 @@
-import { METHODS, STATUS_CODES } from "node:http";
+import { METHODS } from "node:http";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import RoutesTree from "./RoutesTree.js";
 import Route from "./Route.js";
+import { notFoundHandler, errorHandler } from "./middleware.js";
 
 export type Handler = (req: IncomingMessage & { params: Params }, res: ServerResponse) => void | Promise<void>;
 export type Params = Record<string, string>;
-type ErrorHandler = (err: Error, req: IncomingMessage, res: ServerResponse) => void | Promise<void>;
+export type ErrorHandler = (err: Error, req: IncomingMessage, res: ServerResponse) => void | Promise<void>;
 
 class Router {
     middlewares: Handler[] = [];
     groupStack: string[] = [];
     tree: RoutesTree = new RoutesTree;
+    notFoundHandler: Handler;
+    errorHandler: ErrorHandler;
+
+    constructor(notFoundHandler: Handler, errorHandler: ErrorHandler) {
+        if (!notFoundHandler) {
+            throw new Error('notFoundHandler is required');
+        }
+        if (!errorHandler) {
+            throw new Error('errorHandler is required');
+        }
+        this.notFoundHandler = notFoundHandler;
+        this.errorHandler = errorHandler;
+    }
 
     /**
      * Registers a route handler for GET and HEAD requests to a specified URI.
@@ -200,7 +214,7 @@ class Router {
         return route;
     }
 
-    onRequest: Handler = async (req, res) => {
+    async onRequest(req: IncomingMessage & { params: Params }, res: ServerResponse) {
         try {
             if (!req.url || !req.method) {
                 await this.notFoundHandler(req, res);
@@ -230,28 +244,12 @@ class Router {
             await this.errorHandler(err as Error, req, res);
         }
     }
+}
 
-    notFoundHandler: Handler = async (req, res) => {
-        res.statusCode = 404;
-        res.setHeader('Content-Type', 'application/json');
-        res.write(JSON.stringify({
-            status: 404,
-            message: STATUS_CODES[404]
-        }));
-        res.end();
-    };
-
-    errorHandler: ErrorHandler = async (err, req, res) => {
-        console.error(err); // Default: log the error
-        res.statusCode = 500;
-        res.setHeader('Content-Type', 'application/json');
-        res.write(JSON.stringify({
-            status: 500,
-            message: STATUS_CODES[500],
-            error: err.message
-        }));
-        res.end();
-    };
+export {
+    Router,
+    notFoundHandler,
+    errorHandler
 }
 
 export default Router; 

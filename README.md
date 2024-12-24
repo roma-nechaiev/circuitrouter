@@ -42,10 +42,10 @@ Depending on your project setup, you can use **CircuitRouter** with either **Com
 // Import modules
 const http = require('node:http'); // CommonJS
 // import http from "node:http"; // Uncomment for ESM
-const Router = require('circuitrouter/cjs'); // CommonJS
-// import Router from "circuitrouter/esm"; // Uncomment for ESM
+const { Router, notFoundHandler, errorHandler } = require('circuitrouter'); // CommonJS
+// import Router, { notFoundHandler, errorHandler } from "circuitrouter"; // Uncomment for ESM
 
-const router = new Router();
+const router = new Router(notFoundHandler, errorHandler);
 
 // Define routes
 router.get('/hello', (req, res) => res.end('Hello, World!'));
@@ -81,10 +81,10 @@ You can use **CircuitRouter** with **Express** by passing the router's request h
 
 ```javascript
 import express from 'express';
-import Router from 'circuitrouter';
+import Router, { notFoundHandler, errorHandler } from 'circuitrouter';
 
 const app = express();
-const router = new Router();
+const router = new Router(notFoundHandler, errorHandler);
 
 // Define routes using the router
 router.get('/hello', (req, res) => res.send('Hello, World!'));
@@ -187,36 +187,68 @@ router.group('/api/v1', (route) => {
 });
 ```
 
-### Error Handling
+### Middleware Setup
+
+CircuitRouter now allows the direct import and integration of `notFoundHandler` and `errorHandler` from the `circuitrouter` module. These handlers can be passed to the `Router` constructor during instantiation.
+
+#### Example:
 
 ```javascript
-router.errorHandler = async (err, req, res) => {
-  console.error('Error:', err.message);
+import Router, { notFoundHandler, errorHandler } from 'circuitrouter';
+
+const router = new Router(notFoundHandler, errorHandler);
+```
+
+---
+
+### Custom Handlers
+
+You can define and integrate your own `errorHandler` and `notFoundHandler` to customize the behavior of your application. Simply replace the default handlers with your custom implementations when creating the `Router` instance.
+
+#### Custom Error Handler
+
+Define a custom error handler to manage errors in your application:
+
+```javascript
+async function customErrorHandler(err, req, res) {
+  console.error('Custom Error:', err.message);
   res.statusCode = 500;
   res.setHeader('Content-Type', 'application/json');
   res.end(
     JSON.stringify({
       status: 500,
-      error: err.message,
+      message: 'Something went wrong',
+      details: err.message,
     }),
   );
-};
+}
 ```
 
-### 404 Handling
+#### Custom 404 Handler
+
+Create a custom handler for undefined routes:
 
 ```javascript
-router.notFoundHandler = async (req, res) => {
+async function customNotFoundHandler(req, res) {
   res.statusCode = 404;
   res.setHeader('Content-Type', 'application/json');
   res.end(
     JSON.stringify({
       status: 404,
-      message: 'Route not found',
+      message: 'The requested route does not exist',
     }),
   );
-  res.end();
-};
+}
+```
+
+#### Integrating Custom Handlers
+
+Pass your custom handlers to the `Router` constructor:
+
+```javascript
+import Router from 'circuitrouter';
+
+const router = new Router(customNotFoundHandler, customErrorHandler);
 ```
 
 ## API Reference

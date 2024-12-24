@@ -1,58 +1,22 @@
 "use strict";
-const { METHODS, STATUS_CODES } = require("node:http");
+const { METHODS } = require("node:http");
 const RoutesTree = require("./RoutesTree.js");
 const Route = require("./Route.js");
+const { notFoundHandler, errorHandler } = require("./middleware.js");
 /** @type {import('circuitrouter/cjs').Router} */
 class Router {
-    constructor() {
+    constructor(notFoundHandler, errorHandler) {
         this.middlewares = [];
         this.groupStack = [];
         this.tree = new RoutesTree;
-        this.onRequest = async (req, res) => {
-            try {
-                if (!req.url || !req.method) {
-                    await this.notFoundHandler(req, res);
-                    return;
-                }
-                for (const middleware of this.middlewares) {
-                    await middleware(req, res);
-                }
-                const urlWithoutQueryParams = req.url.split('?')[0];
-                const matchedRoute = this.tree.findRoute(req.method, urlWithoutQueryParams);
-                if (!matchedRoute) {
-                    await this.notFoundHandler(req, res);
-                    return;
-                }
-                req.params = matchedRoute.params;
-                for (const routeMiddleware of matchedRoute.route.middlewares) {
-                    await routeMiddleware(req, res);
-                }
-                await matchedRoute.route.action(req, res);
-            }
-            catch (err) {
-                await this.errorHandler(err, req, res);
-            }
-        };
-        this.notFoundHandler = async (req, res) => {
-            res.statusCode = 404;
-            res.setHeader('Content-Type', 'application/json');
-            res.write(JSON.stringify({
-                status: 404,
-                message: STATUS_CODES[404]
-            }));
-            res.end();
-        };
-        this.errorHandler = async (err, req, res) => {
-            console.error(err);
-            res.statusCode = 500;
-            res.setHeader('Content-Type', 'application/json');
-            res.write(JSON.stringify({
-                status: 500,
-                message: STATUS_CODES[500],
-                error: err.message
-            }));
-            res.end();
-        };
+        if (!notFoundHandler) {
+            throw new Error('notFoundHandler is required');
+        }
+        if (!errorHandler) {
+            throw new Error('errorHandler is required');
+        }
+        this.notFoundHandler = notFoundHandler;
+        this.errorHandler = errorHandler;
     }
     get(uri, action) {
         return this.createRoute(['GET', 'HEAD'], uri, action);
@@ -108,7 +72,7 @@ class Router {
     }
     group(prefix, routes) {
         this.groupStack.push(prefix);
-        routes(this);
+        routes(this); // Allow the provided function to register routes with this group
         this.groupStack.pop();
     }
     middleware(...handlers) {
@@ -122,10 +86,35 @@ class Router {
     }
     createRoute(methods, uri, action) {
         const methodsArray = Array.isArray(methods) ? methods : [methods];
-        const uriWithPrefix = this.groupStack.length ? `${this.groupStack.join('/')}${uri}` : uri;
+        const uriWithPrefix = this.groupStack.length ? `${this.groupStack.join('/')}${uri}` : uri; // Apply prefix if in a group
         const route = new Route(methodsArray, uriWithPrefix, action);
         this.tree.addRoute(route, methodsArray);
         return route;
     }
+    async onRequest(req, res) {
+        try {
+            if (!req.url || !req.method) {
+                await this.notFoundHandler(req, res);
+                return;
+            }
+            for (const middleware of this.middlewares) {
+                await middleware(req, res);
+            }
+            const urlWithoutQueryParams = req.url.split('?')[0];
+            const matchedRoute = this.tree.findRoute(req.method, urlWithoutQueryParams);
+            if (!matchedRoute) {
+                await this.notFoundHandler(req, res);
+                return;
+            }
+            req.params = matchedRoute.params;
+            for (const routeMiddleware of matchedRoute.route.middlewares) {
+                await routeMiddleware(req, res);
+            }
+            await matchedRoute.route.action(req, res);
+        }
+        catch (err) {
+            await this.errorHandler(err, req, res);
+        }
+    }
 }
-module.exports = Router;
+module.exports = { Router, notFoundHandler, errorHandler }; 
