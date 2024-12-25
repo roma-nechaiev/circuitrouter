@@ -5,18 +5,28 @@ const Route = require("./Route.js");
 const { notFoundHandler, errorHandler } = require("./middleware.js");
 /** @type {import('circuitrouter/cjs').Router} */
 class Router {
-    constructor(notFoundHandler, errorHandler) {
+    constructor(notFoundFn, errorFn) {
         this.middlewares = [];
         this.groupStack = [];
         this.tree = new RoutesTree;
-        if (!notFoundHandler) {
-            throw new Error('notFoundHandler is required');
+        if (!notFoundFn) {
+            this.notFoundHandler = notFoundHandler;
         }
-        if (!errorHandler) {
-            throw new Error('errorHandler is required');
+        else {
+            if (typeof notFoundFn !== 'function') {
+                throw new Error('notFound should be a function');
+            }
+            this.notFoundHandler = notFoundFn;
         }
-        this.notFoundHandler = notFoundHandler;
-        this.errorHandler = errorHandler;
+        if (!errorFn) {
+            this.errorHandler = errorHandler;
+        }
+        else {
+            if (typeof errorFn !== 'function') {
+                throw new Error('error should be a function');
+            }
+            this.errorHandler = errorFn;
+        }
     }
     get(uri, action) {
         return this.createRoute(['GET', 'HEAD'], uri, action);
@@ -117,4 +127,4 @@ class Router {
         }
     }
 }
-module.exports = { Router, notFoundHandler, errorHandler }; 
+module.exports = Router; 

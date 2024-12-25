@@ -15,15 +15,24 @@ class Router {
     notFoundHandler: Handler;
     errorHandler: ErrorHandler;
 
-    constructor(notFoundHandler: Handler, errorHandler: ErrorHandler) {
-        if (!notFoundHandler) {
-            throw new Error('notFoundHandler is required');
+    constructor(notFoundFn?: Handler, errorFn?: ErrorHandler) {
+        if (!notFoundFn) {
+            this.notFoundHandler = notFoundHandler;
+        } else {
+            if (typeof notFoundFn !== 'function') {
+                throw new Error('notFound should be a function');
+            }
+            this.notFoundHandler = notFoundFn;
         }
-        if (!errorHandler) {
-            throw new Error('errorHandler is required');
+
+        if (!errorFn) {
+            this.errorHandler = errorHandler;
+        } else {
+            if (typeof errorFn !== 'function') {
+                throw new Error('error should be a function');
+            }
+            this.errorHandler = errorFn;
         }
-        this.notFoundHandler = notFoundHandler;
-        this.errorHandler = errorHandler;
     }
 
     /**
@@ -244,12 +253,6 @@ class Router {
             await this.errorHandler(err as Error, req, res);
         }
     }
-}
-
-export {
-    Router,
-    notFoundHandler,
-    errorHandler
 }
 
 export default Router; 

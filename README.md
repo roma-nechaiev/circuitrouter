@@ -42,10 +42,10 @@ Depending on your project setup, you can use **CircuitRouter** with either **Com
 // Import modules
 const http = require('node:http'); // CommonJS
 // import http from "node:http"; // Uncomment for ESM
-const { Router, notFoundHandler, errorHandler } = require('circuitrouter'); // CommonJS
-// import Router, { notFoundHandler, errorHandler } from "circuitrouter"; // Uncomment for ESM
+const Router = require('circuitrouter'); // CommonJS
+// import Router from "circuitrouter"; // Uncomment for ESM
 
-const router = new Router(notFoundHandler, errorHandler);
+const router = new Router();
 
 // Define routes
 router.get('/hello', (req, res) => res.end('Hello, World!'));
@@ -190,14 +190,6 @@ router.group('/api/v1', (route) => {
 ### Error Handlers Setup
 
 CircuitRouter now allows the direct import and integration of `notFoundHandler` and `errorHandler` from the `circuitrouter` module. These handlers can be passed to the `Router` constructor during instantiation.
-
-#### Example:
-
-```javascript
-import Router, { notFoundHandler, errorHandler } from 'circuitrouter';
-
-const router = new Router(notFoundHandler, errorHandler);
-```
 
 ---
 

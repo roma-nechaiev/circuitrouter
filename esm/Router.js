@@ -3,18 +3,28 @@ import RoutesTree from "./RoutesTree.js";
 import Route from "./Route.js";
 import { notFoundHandler, errorHandler } from "./middleware.js";
 class Router {
-    constructor(notFoundHandler, errorHandler) {
+    constructor(notFoundFn, errorFn) {
         this.middlewares = [];
         this.groupStack = [];
         this.tree = new RoutesTree;
-        if (!notFoundHandler) {
-            throw new Error('notFoundHandler is required');
+        if (!notFoundFn) {
+            this.notFoundHandler = notFoundHandler;
         }
-        if (!errorHandler) {
-            throw new Error('errorHandler is required');
+        else {
+            if (typeof notFoundFn !== 'function') {
+                throw new Error('notFound should be a function');
+            }
+            this.notFoundHandler = notFoundFn;
         }
-        this.notFoundHandler = notFoundHandler;
-        this.errorHandler = errorHandler;
+        if (!errorFn) {
+            this.errorHandler = errorHandler;
+        }
+        else {
+            if (typeof errorFn !== 'function') {
+                throw new Error('error should be a function');
+            }
+            this.errorHandler = errorFn;
+        }
     }
     /**
      * Registers a route handler for GET and HEAD requests to a specified URI.
@@ -206,5 +216,4 @@ class Router {
         }
     }
 }
-export { Router, notFoundHandler, errorHandler };
 export default Router;

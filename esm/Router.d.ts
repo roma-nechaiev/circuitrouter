@@ -1,7 +1,6 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import RoutesTree from "./RoutesTree.js";
 import Route from "./Route.js";
-import { notFoundHandler, errorHandler } from "./middleware.js";
 export type Handler = (req: IncomingMessage & {
     params: Params;
 }, res: ServerResponse) => void | Promise<void>;
@@ -13,7 +12,7 @@ declare class Router {
     tree: RoutesTree;
     notFoundHandler: Handler;
     errorHandler: ErrorHandler;
-    constructor(notFoundHandler: Handler, errorHandler: ErrorHandler);
+    constructor(notFoundFn?: Handler, errorFn?: ErrorHandler);
     /**
      * Registers a route handler for GET and HEAD requests to a specified URI.
      *
@@ -121,5 +120,4 @@ declare class Router {
         params: Params;
     }, res: ServerResponse): Promise<void>;
 }
-export { Router, notFoundHandler, errorHandler };
 export default Router;

@@ -17,10 +17,6 @@
       }
     }
   },
-  "imports": {
-    "#esm": "./esm/Router.js",
-    "#cjs": "./cjs/Router.js"
-  },
   "files": [
     "esm",
     "cjs"
