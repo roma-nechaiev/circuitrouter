@@ -230,10 +230,6 @@ class Router {
                 return;
             }
 
-            for (const middleware of this.middlewares) {
-                await middleware(req, res);
-            }
-
             const urlWithoutQueryParams = req.url.split('?')[0];
             const matchedRoute = this.tree.findRoute(req.method, urlWithoutQueryParams);
 
@@ -244,8 +240,12 @@ class Router {
 
             req.params = matchedRoute.params;
 
-            for (const routeMiddleware of matchedRoute.route.middlewares) {
-                await routeMiddleware(req, res);
+            for await (const middleware of this.middlewares) {
+                middleware(req, res);
+            }
+
+            for await (const routeMiddleware of matchedRoute.route.middlewares) {
+                routeMiddleware(req, res);
             }
 
             await matchedRoute.route.action(req, res);

@@ -67,7 +67,9 @@ router.method('report', '/report', (req, res) => {
 });
 
 // Create the server
-const server = http.createServer((req, res) => router.onRequest(req, res));
+const server = http.createServer(
+  async (req, res) => await router.onRequest(req, res),
+);
 server.listen(3000, () => {
   console.log('Server is running on http://localhost:3000');
 });
@@ -81,17 +83,17 @@ You can use **CircuitRouter** with **Express** by passing the router's request h
 
 ```javascript
 import express from 'express';
-import Router, { notFoundHandler, errorHandler } from 'circuitrouter';
+import Router from 'circuitrouter';
 
 const app = express();
-const router = new Router(notFoundHandler, errorHandler);
+const router = new Router();
 
 // Define routes using the router
 router.get('/hello', (req, res) => res.send('Hello, World!'));
 router.post('/data', (req, res) => res.send('Data received'));
 
 // Use the router with Express using app.use()
-app.use((req, res) => router.onRequest(req, res)); // Pass router's onRequest handler
+app.use(async (req, res) => await router.onRequest(req, res)); // Pass router's onRequest handler
 
 // Start the server
 app.listen(3000, () => {
